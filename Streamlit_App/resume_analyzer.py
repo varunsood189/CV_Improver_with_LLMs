@@ -4,7 +4,9 @@ import json, warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
 
 import datetime, json
-
+import time
+def delayed():
+    time.sleep(1) 
 from langchain.prompts import PromptTemplate
 
 from app_constants import (
@@ -114,7 +116,7 @@ def invoke_LLM(
      - response_content (str): the content of the LLM response.
      - response_tokens_count (int): count of response tokens.
     """
-
+    delayed()
     # 1. display the info message
     st.info(f"**{get_current_time()}** \t{info_message}")
     print(f"**{get_current_time()}** \t{info_message}")
@@ -130,8 +132,8 @@ def invoke_LLM(
         prompt = prompt_template.format_prompt(text=documents, language=language).text
     else:
         prompt = prompt_template.format_prompt(text=documents).text
-
     # 4. Invoke LLM
+    delayed()
     response = llm.invoke(prompt)
 
     response_content = response.content[
@@ -150,9 +152,9 @@ def ResponseContent_Parser(
     - response_content (str): the content of the LLM response we are going to parse.
     - list_fields (list): List of dictionary fields returned by this function.
         A field can be a dictionary. The key of the dict will not be parsed.
-        Example: [{'Contact__information':['candidate__location','candidate__email','candidate__phone','candidate__social_media']},
-                   'CV__summary']
-                   We will not parse the content for 'Contact__information'.
+        Example: [{'Contact_information':['candidate_location','candidate_email','candidate_phone','candidate_social_media']},
+                   'CV_summary']
+                   We will not parse the content for 'Contact_information'.
     - list_rfind (list): To parse the content of a field, first we will extract the text between this field and the next field.
         Then, extract text using `rfind` Python command, which returns the highest index in the text where the substring is found.
     - list_exclude_first_car (list): Exclusion or not of the first and last characters.
@@ -207,12 +209,12 @@ def ResponseContent_Parser(
 
 def Extract_contact_information(llm, documents):
     """Extract Contact Information: Name, Title, Location, Email, Phone number and Social media profiles."""
-
+    
     try:
         response_content, response_tokens_count = invoke_LLM(
             llm,
             documents,
-            resume_sections=["Contact__information"],
+            resume_sections=["Contact_information"],
             info_message="Extract and evaluate contact information...",
             language=st.session_state.assistant_language,
         )
@@ -226,15 +228,15 @@ def Extract_contact_information(llm, documents):
 
             list_fields = [
                 {
-                    "Contact__information": [
-                        "candidate__name",
-                        "candidate__title",
-                        "candidate__location",
-                        "candidate__email",
-                        "candidate__phone",
-                        "candidate__social_media",
-                        "evaluation__ContactInfo",
-                        "score__ContactInfo",
+                    "Contact_information": [
+                        "candidate_name",
+                        "candidate_title",
+                        "candidate_location",
+                        "candidate_email",
+                        "candidate_phone",
+                        "candidate_social_media",
+                        "evaluation_ContactInfo",
+                        "score_ContactInfo",
                     ]
                 }
             ]
@@ -255,24 +257,24 @@ def Extract_contact_information(llm, documents):
             )
             # convert score to int
             try:
-                CONTACT_INFORMATION["Contact__information"]["score__ContactInfo"] = int(
-                    CONTACT_INFORMATION["Contact__information"]["score__ContactInfo"]
+                CONTACT_INFORMATION["Contact_information"]["score_ContactInfo"] = int(
+                    CONTACT_INFORMATION["Contact_information"]["score_ContactInfo"]
                 )
             except:
-                CONTACT_INFORMATION["Contact__information"]["score__ContactInfo"] = -1
+                CONTACT_INFORMATION["Contact_information"]["score_ContactInfo"] = -1
 
     except Exception as exception:
         print(f"[Error] {exception}")
         CONTACT_INFORMATION = {
-            "Contact__information": {
-                "candidate__name": "unknown",
-                "candidate__title": "unknown",
-                "candidate__location": "unknown",
-                "candidate__email": "unknown",
-                "candidate__phone": "unknown",
-                "candidate__social_media": "unknown",
-                "evaluation__ContactInfo": "unknown",
-                "score__ContactInfo": -1,
+            "Contact_information": {
+                "candidate_name": "unknown",
+                "candidate_title": "unknown",
+                "candidate_location": "unknown",
+                "candidate_email": "unknown",
+                "candidate_phone": "unknown",
+                "candidate_social_media": "unknown",
+                "evaluation_ContactInfo": "unknown",
+                "score_ContactInfo": -1,
             }
         }
 
@@ -289,7 +291,7 @@ def Extract_Evaluate_Summary(llm, documents):
         response_content, response_tokens_count = invoke_LLM(
             llm,
             documents,
-            resume_sections=["CV__summary"],
+            resume_sections=["CV_summary"],
             info_message="Extract and evaluate the Summary....",
             language=st.session_state.assistant_language,
         )
@@ -300,7 +302,7 @@ def Extract_Evaluate_Summary(llm, documents):
             print("[ERROR] json.loads returns error:", e)
             print("\n[INFO] Parse response content...\n")
 
-            list_fields = ["CV__summary"]
+            list_fields = ["CV_summary"]
             list_rfind = ["}\n"]
             list_exclude_first_car = [True]
 
@@ -310,7 +312,7 @@ def Extract_Evaluate_Summary(llm, documents):
 
     except Exception as exception:
         print(f"[Error] {exception}")
-        SUMMARY_SECTION = {"CV__summary": "unknown"}
+        SUMMARY_SECTION = {"CV_summary": "unknown"}
 
     ######################################
     # 2. Evaluate the summary
@@ -322,10 +324,11 @@ def Extract_Evaluate_Summary(llm, documents):
         prompt = prompt_template.format_prompt(
             resume=documents,
             language=st.session_state.assistant_language,
-            summary=SUMMARY_SECTION["CV__summary"],
+            summary=SUMMARY_SECTION["CV_summary"],
         ).text
 
         # Invoke LLM
+        delayed()
         response = llm.invoke(prompt)
         response_content = response.content[
             response.content.find("{") : response.content.rfind("}") + 1
@@ -333,7 +336,7 @@ def Extract_Evaluate_Summary(llm, documents):
 
         try:
             SUMMARY_EVAL = {}
-            SUMMARY_EVAL["Summary__evaluation"] = json.loads(
+            SUMMARY_EVAL["Summary_evaluation"] = json.loads(
                 response_content, strict=False
             )
         except Exception as e:
@@ -341,34 +344,34 @@ def Extract_Evaluate_Summary(llm, documents):
             print("\n[INFO] Parse response content...\n")
 
             list_fields = [
-                "evaluation__summary",
-                "score__summary",
-                "CV__summary_enhanced",
+                "evaluation_summary",
+                "score_summary",
+                "CV_summary_enhanced",
             ]
             list_rfind = [",\n", ",\n", "}\n"]
             list_exclude_first_car = [True, False, True]
-            SUMMARY_EVAL["Summary__evaluation"] = ResponseContent_Parser(
+            SUMMARY_EVAL["Summary_evaluation"] = ResponseContent_Parser(
                 response_content, list_fields, list_rfind, list_exclude_first_car
             )
             # convert score to int
             try:
-                SUMMARY_EVAL["Summary__evaluation"]["score__summary"] = int(
-                    SUMMARY_EVAL["Summary__evaluation"]["score__summary"]
+                SUMMARY_EVAL["Summary_evaluation"]["score_summary"] = int(
+                    SUMMARY_EVAL["Summary_evaluation"]["score_summary"]
                 )
             except:
-                SUMMARY_EVAL["Summary__evaluation"]["score__summary"] = -1
+                SUMMARY_EVAL["Summary_evaluation"]["score_summary"] = -1
 
     except Exception as e:
         print(e)
         SUMMARY_EVAL = {
-            "Summary__evaluation": {
-                "evaluation__summary": "unknown",
-                "score__summary": -1,
-                "CV__summary_enhanced": "unknown",
+            "Summary_evaluation": {
+                "evaluation_summary": "unknown",
+                "score_summary": -1,
+                "CV_summary_enhanced": "unknown",
             }
         }
 
-    SUMMARY_EVAL["CV__summary"] = SUMMARY_SECTION["CV__summary"]
+    SUMMARY_EVAL["CV_summary"] = SUMMARY_SECTION["CV_summary"]
 
     return SUMMARY_EVAL
 
@@ -381,10 +384,10 @@ def Extract_Education_Language(llm, documents):
             llm,
             documents,
             resume_sections=[
-                "CV__Education",
-                "Education__evaluation",
-                "CV__Languages",
-                "Languages__evaluation",
+                "CV_Education",
+                "Education_evaluation",
+                "CV_Languages",
+                "Languages_evaluation",
             ],
             info_message="Extract and evaluate education and language sections...",
             language=st.session_state.assistant_language,
@@ -398,10 +401,10 @@ def Extract_Education_Language(llm, documents):
             print("\n[INFO] Parse response content...\n")
 
             list_fields = [
-                "CV__Education",
-                {"Education__evaluation": ["score__edu", "evaluation__edu"]},
-                "CV__Languages",
-                {"Languages__evaluation": ["score__language", "evaluation__language"]},
+                "CV_Education",
+                {"Education_evaluation": ["score_edu", "evaluation_edu"]},
+                "CV_Languages",
+                {"Languages_evaluation": ["score_language", "evaluation_language"]},
             ]
 
             list_rfind = [",\n", ",\n", ",\n", ",\n", ",\n", ",\n", ",\n", "\n"]
@@ -413,62 +416,62 @@ def Extract_Education_Language(llm, documents):
 
             # Convert scores to int
             try:
-                Education_Language_sections["Education__evaluation"]["score__edu"] = (
+                Education_Language_sections["Education_evaluation"]["score_edu"] = (
                     int(
-                        Education_Language_sections["Education__evaluation"][
-                            "score__edu"
+                        Education_Language_sections["Education_evaluation"][
+                            "score_edu"
                         ]
                     )
                 )
             except:
-                Education_Language_sections["Education__evaluation"]["score__edu"] = -1
+                Education_Language_sections["Education_evaluation"]["score_edu"] = -1
 
             try:
-                Education_Language_sections["Languages__evaluation"][
-                    "score__language"
+                Education_Language_sections["Languages_evaluation"][
+                    "score_language"
                 ] = int(
-                    Education_Language_sections["Languages__evaluation"][
-                        "score__language"
+                    Education_Language_sections["Languages_evaluation"][
+                        "score_language"
                     ]
                 )
             except:
-                Education_Language_sections["Languages__evaluation"][
-                    "score__language"
+                Education_Language_sections["Languages_evaluation"][
+                    "score_language"
                 ] = -1
 
             # Split languages and educational texts into a Python list of dict
-            languages = Education_Language_sections["CV__Languages"]
-            Education_Language_sections["CV__Languages"] = (
+            languages = Education_Language_sections["CV_Languages"]
+            Education_Language_sections["CV_Languages"] = (
                 convert_text_to_list_of_dicts(
                     text=languages[
                         languages.find("[") + 1 : languages.rfind("]")
                     ].strip(),
-                    dict_keys=["spoken__language", "language__fluency"],
+                    dict_keys=["spoken_language", "language_fluency"],
                 )
             )
-            education = Education_Language_sections["CV__Education"]
-            Education_Language_sections["CV__Education"] = (
+            education = Education_Language_sections["CV_Education"]
+            Education_Language_sections["CV_Education"] = (
                 convert_text_to_list_of_dicts(
                     text=education[
                         education.find("[") + 1 : education.rfind("]")
                     ].strip(),
                     dict_keys=[
-                        "edu__college",
-                        "edu__degree",
-                        "edu__start_date",
-                        "edu__end_date",
+                        "edu_college",
+                        "edu_degree",
+                        "edu_start_date",
+                        "edu_end_date",
                     ],
                 )
             )
     except Exception as exception:
         print(exception)
         Education_Language_sections = {
-            "CV__Education": [],
-            "Education__evaluation": {"score__edu": -1, "evaluation__edu": "unknown"},
-            "CV__Languages": [],
-            "Languages__evaluation": {
-                "score__language": -1,
-                "evaluation__language": "unknown",
+            "CV_Education": [],
+            "Education_evaluation": {"score_edu": -1, "evaluation_edu": "unknown"},
+            "CV_Languages": [],
+            "Languages_evaluation": {
+                "score_language": -1,
+                "evaluation_language": "unknown",
             },
         }
 
@@ -477,21 +480,19 @@ def Extract_Education_Language(llm, documents):
 
 def Extract_Skills_and_Certifications(llm, documents):
     """Extract skills and certifications and evaluate these sections."""
-
     try:
         response_content, response_tokens_count = invoke_LLM(
             llm,
             documents,
             resume_sections=[
-                "candidate__skills",
-                "Skills__evaluation",
-                "CV__Certifications",
-                "Certif__evaluation",
+                "candidate_skills",
+                "Skills_evaluation",
+                "CV_Certifications",
+                "Certif_evaluation",
             ],
             info_message="Extract and evaluate the skills and certifications...",
             language=st.session_state.assistant_language,
         )
-
         try:
             # Load response_content to json dictionary
             SKILLS_and_CERTIF = json.loads(response_content, strict=False)
@@ -500,38 +501,38 @@ def Extract_Skills_and_Certifications(llm, documents):
             print("\n[INFO] Parse response content...\n")
 
             skills = extract_from_text(
-                response_content, '"candidate__skills": ', '"Skills__evaluation":'
+                response_content, '"candidate_skills": ', '"Skills_evaluation":'
             )
             skills = skills.replace("\n  ", "\n").replace("],\n", "").replace("[\n", "")
             score_skills = extract_from_text(
-                response_content, '"score__skills": ', '"evaluation__skills":'
+                response_content, '"score_skills": ', '"evaluation_skills":'
             )
             evaluation_skills = extract_from_text(
-                response_content, '"evaluation__skills": ', '"CV__Certifications":'
+                response_content, '"evaluation_skills": ', '"CV_Certifications":'
             )
 
             certif_text = extract_from_text(
-                response_content, '"CV__Certifications": ', '"Certif__evaluation":'
+                response_content, '"CV_Certifications": ', '"Certif_evaluation":'
             )
             certif_score = extract_from_text(
-                response_content, '"score__certif": ', '"evaluation__certif":'
+                response_content, '"score_certif": ', '"evaluation_certif":'
             )
             certif_eval = extract_from_text(
-                response_content, '"evaluation__certif": ', None
+                response_content, '"evaluation_certif": ', None
             )
 
             # Create the dictionary
             SKILLS_and_CERTIF = {}
-            SKILLS_and_CERTIF["candidate__skills"] = [
+            SKILLS_and_CERTIF["candidate_skills"] = [
                 skill.strip()[1:-1] for skill in skills.split(",\n")
             ]
             try:
                 score_skills_int = int(score_skills[0 : score_skills.rfind(",\n")])
             except:
                 score_skills_int = -1
-            SKILLS_and_CERTIF["Skills__evaluation"] = {
-                "score__skills": score_skills_int,
-                "evaluation__skills": evaluation_skills[
+            SKILLS_and_CERTIF["Skills_evaluation"] = {
+                "score_skills": score_skills_int,
+                "evaluation_skills": evaluation_skills[
                     : evaluation_skills.rfind("}\n")
                 ].strip()[1:-1],
             }
@@ -542,40 +543,39 @@ def Extract_Skills_and_Certifications(llm, documents):
                     certif_text.find("[") + 1 : certif_text.rfind("]")
                 ].strip(),  # .strip()[1:-1]
                 dict_keys=[
-                    "certif__title",
-                    "certif__organization",
-                    "certif__date",
-                    "certif__expiry_date",
-                    "certif__details",
+                    "certif_title",
+                    "certif_organization",
+                    "certif_date",
+                    "certif_expiry_date",
+                    "certif_details",
                 ],
             )
-            SKILLS_and_CERTIF["CV__Certifications"] = list_certifs
+            SKILLS_and_CERTIF["CV_Certifications"] = list_certifs
             try:
                 certif_score_int = int(certif_score[0 : certif_score.rfind(",\n")])
             except:
                 certif_score_int = -1
-            SKILLS_and_CERTIF["Certif__evaluation"] = {
-                "score__certif": certif_score_int,
-                "evaluation__certif": certif_eval[: certif_eval.rfind("}\n")].strip()[
+            SKILLS_and_CERTIF["Certif_evaluation"] = {
+                "score_certif": certif_score_int,
+                "evaluation_certif": certif_eval[: certif_eval.rfind("}\n")].strip()[
                     1:-1
                 ],
             }
 
     except Exception as exception:
         SKILLS_and_CERTIF = {
-            "candidate__skills": [],
-            "Skills__evaluation": {
-                "score__skills": -1,
-                "evaluation__skills": "unknown",
+            "candidate_skills": [],
+            "Skills_evaluation": {
+                "score_skills": -1,
+                "evaluation_skills": "unknown",
             },
-            "CV__Certifications": [],
-            "Certif__evaluation": {
-                "score__certif": -1,
-                "evaluation__certif": "unknown",
+            "CV_Certifications": [],
+            "Certif_evaluation": {
+                "score_certif": -1,
+                "evaluation_certif": "unknown",
             },
         }
         print(exception)
-
     return SKILLS_and_CERTIF
 
 
@@ -586,7 +586,7 @@ def Extract_PROFESSIONAL_EXPERIENCE(llm, documents):
         response_content, response_tokens_count = invoke_LLM(
             llm,
             documents,
-            resume_sections=["Work__experience", "CV__Projects"],
+            resume_sections=["Work_experience", "CV_Projects"],
             info_message="Extract list of work experience and projects...",
             language=st.session_state.assistant_language,
         )
@@ -599,49 +599,49 @@ def Extract_PROFESSIONAL_EXPERIENCE(llm, documents):
             print("\n[INFO] Parse response content...\n")
 
             work_experiences = extract_from_text(
-                response_content, '"Work__experience": ', '"CV__Projects":'
+                response_content, '"Work_experience": ', '"CV_Projects":'
             )
-            projects = extract_from_text(response_content, '"CV__Projects": ', None)
+            projects = extract_from_text(response_content, '"CV_Projects": ', None)
 
             # Create the dictionary
             PROFESSIONAL_EXPERIENCE = {}
-            PROFESSIONAL_EXPERIENCE["Work__experience"] = convert_text_to_list_of_dicts(
+            PROFESSIONAL_EXPERIENCE["Work_experience"] = convert_text_to_list_of_dicts(
                 text=work_experiences[
                     work_experiences.find("[") + 1 : work_experiences.rfind("]")
                 ].strip()[1:-1],
                 dict_keys=[
-                    "job__title",
-                    "job__company",
-                    "job__start_date",
-                    "job__end_date",
+                    "job_title",
+                    "job_company",
+                    "job_start_date",
+                    "job_end_date",
                 ],
             )
-            PROFESSIONAL_EXPERIENCE["CV__Projects"] = convert_text_to_list_of_dicts(
+            PROFESSIONAL_EXPERIENCE["CV_Projects"] = convert_text_to_list_of_dicts(
                 text=projects[projects.find("[") + 1 : projects.rfind("]")].strip()[
                     1:-1
                 ],
                 dict_keys=[
-                    "project__title",
-                    "project__start_date",
-                    "project__end_date",
+                    "project_title",
+                    "project_start_date",
+                    "project_end_date",
                 ],
             )
         # Exclude 'unknown' projects and work experiences
         try:
-            for work_experience in PROFESSIONAL_EXPERIENCE["Work__experience"]:
-                if work_experience["job__title"] == "unknown":
-                    PROFESSIONAL_EXPERIENCE["Work__experience"].remove(work_experience)
+            for work_experience in PROFESSIONAL_EXPERIENCE["Work_experience"]:
+                if work_experience["job_title"] == "unknown":
+                    PROFESSIONAL_EXPERIENCE["Work_experience"].remove(work_experience)
         except Exception as e:
             print(e)
         try:
-            for project in PROFESSIONAL_EXPERIENCE["CV__Projects"]:
-                if project["project__title"] == "unknown":
-                    PROFESSIONAL_EXPERIENCE["CV__Projects"].remove(project)
+            for project in PROFESSIONAL_EXPERIENCE["CV_Projects"]:
+                if project["project_title"] == "unknown":
+                    PROFESSIONAL_EXPERIENCE["CV_Projects"].remove(project)
         except Exception as e:
             print(e)
 
     except Exception as exception:
-        PROFESSIONAL_EXPERIENCE = {"Work__experience": [], "CV__Projects": []}
+        PROFESSIONAL_EXPERIENCE = {"Work_experience": [], "CV_Projects": []}
         print(exception)
 
     return PROFESSIONAL_EXPERIENCE
@@ -691,20 +691,20 @@ def Extract_Job_Responsibilities(llm, documents, PROFESSIONAL_EXPERIENCE):
     st.info(f"**{get_current_time()}** \tExtract work experience responsibilities...")
     print(f"**{get_current_time()}** \tExtract work experience responsibilities...")
 
-    for i in range(len(PROFESSIONAL_EXPERIENCE["Work__experience"])):
+    for i in range(len(PROFESSIONAL_EXPERIENCE["Work_experience"])):
         try:
-            Work_experience_i = PROFESSIONAL_EXPERIENCE["Work__experience"][i]
+            Work_experience_i = PROFESSIONAL_EXPERIENCE["Work_experience"][i]
 
             # 1. Extract relevant documents
             query = f"""Extract from the resume delimited by triple backticks \
 all the duties and responsibilities of the following work experience: \
-(title = '{Work_experience_i['job__title']}'"""
-            if str(Work_experience_i["job__company"]) != "unknown":
-                query += f" and company = '{Work_experience_i['job__company']}'"
-            if str(Work_experience_i["job__start_date"]) != "unknown":
-                query += f" and start date = '{Work_experience_i['job__start_date']}'"
-            if str(Work_experience_i["job__end_date"]) != "unknown":
-                query += f" and end date = '{Work_experience_i['job__end_date']}'"
+(title = '{Work_experience_i['job_title']}'"""
+            if str(Work_experience_i["job_company"]) != "unknown":
+                query += f" and company = '{Work_experience_i['job_company']}'"
+            if str(Work_experience_i["job_start_date"]) != "unknown":
+                query += f" and start date = '{Work_experience_i['job_start_date']}'"
+            if str(Work_experience_i["job_end_date"]) != "unknown":
+                query += f" and end date = '{Work_experience_i['job_end_date']}'"
             query += ")\n"
 
             try:
@@ -717,10 +717,11 @@ all the duties and responsibilities of the following work experience: \
 
             prompt = (
                 query
-                + f"""Output the duties in a json dictionary with the following keys (__duty_id__,__duty__). \
+                + f"""Output the duties in a json dictionary with the following keys (_duty_id_,_duty_). \
 Use this format: "1":"duty","2":"another duty".
 Resume:\n\n ```{relevant_documents}```"""
             )
+            delayed()
             response = llm.invoke(prompt)
 
             # 3. Convert the response content to json dict and update work_experience
@@ -729,14 +730,14 @@ Resume:\n\n ```{relevant_documents}```"""
             ]
 
             try:
-                Work_experience_i["work__duties"] = json.loads(
+                Work_experience_i["work_duties"] = json.loads(
                     response_content, strict=False
                 )  # Convert the response content to a json dict
             except Exception as e:
                 print("\njson.loads returns error:", e, "\n\n")
                 print("\n[INFO] Parse response content...\n")
 
-                Work_experience_i["work__duties"] = {}
+                Work_experience_i["work_duties"] = {}
                 list_duties = (
                     response_content[
                         response_content.find("{") + 1 : response_content.rfind("}")
@@ -747,14 +748,14 @@ Resume:\n\n ```{relevant_documents}```"""
 
                 for j in range(len(list_duties)):
                     try:
-                        Work_experience_i["work__duties"][f"{j+1}"] = (
+                        Work_experience_i["work_duties"][f"{j+1}"] = (
                             list_duties[j].split('":')[1].strip()[1:-1]
                         )
                     except:
-                        Work_experience_i["work__duties"][f"{j+1}"] = "unknown"
+                        Work_experience_i["work_duties"][f"{j+1}"] = "unknown"
 
         except Exception as exception:
-            Work_experience_i["work__duties"] = {}
+            Work_experience_i["work_duties"] = {}
             print(exception)
 
     return PROFESSIONAL_EXPERIENCE
@@ -766,17 +767,17 @@ def Extract_Project_Details(llm, documents, PROFESSIONAL_EXPERIENCE):
     st.info(f"**{get_current_time()}** \tExtract project details...")
     print(f"**{get_current_time()}** \tExtract project details...")
 
-    for i in range(len(PROFESSIONAL_EXPERIENCE["CV__Projects"])):
+    for i in range(len(PROFESSIONAL_EXPERIENCE["CV_Projects"])):
         try:
-            project_i = PROFESSIONAL_EXPERIENCE["CV__Projects"][i]
+            project_i = PROFESSIONAL_EXPERIENCE["CV_Projects"][i]
 
             # 1. Extract relevant documents
             query = f"""Extract from the resume (delimited by triple backticks) what is listed about the following project: \
-(project title = '{project_i['project__title']}'"""
-            if str(project_i["project__start_date"]) != "unknown":
-                query += f" and start date = '{project_i['project__start_date']}'"
-            if str(project_i["project__end_date"]) != "unknown":
-                query += f" and end date = '{project_i['project__end_date']}'"
+(project title = '{project_i['project_title']}'"""
+            if str(project_i["project_start_date"]) != "unknown":
+                query += f" and start date = '{project_i['project_start_date']}'"
+            if str(project_i["project_end_date"]) != "unknown":
+                query += f" and end date = '{project_i['project_end_date']}'"
             query += ")"
 
             try:
@@ -792,14 +793,14 @@ def Extract_Project_Details(llm, documents, PROFESSIONAL_EXPERIENCE):
                 + f"""Format the extracted text into a string (with bullet points).
 Resume:\n\n ```{relevant_documents}```"""
             )
-
+            delayed()
             response = llm.invoke(prompt)
 
             response_content = response.content
-            project_i["project__description"] = response_content
+            project_i["project_description"] = response_content
 
         except Exception as exception:
-            project_i["project__description"] = "unknown"
+            project_i["project_description"] = "unknown"
             print(exception)
 
     return PROFESSIONAL_EXPERIENCE
@@ -813,6 +814,7 @@ Resume:\n\n ```{relevant_documents}```"""
 def improve_text_quality(PROMPT, text_to_imporve, llm, language):
     """Invoke LLM to improve the text quality."""
     query = PROMPT.format(text=text_to_imporve, language=language)
+    delayed()
     response = llm.invoke(query)
     return response
 
@@ -832,7 +834,7 @@ def improve_work_experience(WORK_EXPERIENCE: list, llm):
             # 1. Convert the responsibilities from dict to string
 
             text_duties = ""
-            for duty in list(WORK_EXPERIENCE_i["work__duties"].values()):
+            for duty in list(WORK_EXPERIENCE_i["work_duties"].values()):
                 text_duties += "- " + duty
             # 2. Call LLM
 
@@ -845,7 +847,7 @@ def improve_work_experience(WORK_EXPERIENCE: list, llm):
             response_content = response.content
 
             # 3. Convert response content to json dict with keys:
-            # ('Score__WorkExperience','Comments__WorkExperience','Improvement__WorkExperience')
+            # ('Score_WorkExperience','Comments_WorkExperience','Improvement_WorkExperience')
 
             response_content = response_content[
                 response_content.find("{") : response_content.rfind("}") + 1
@@ -853,9 +855,9 @@ def improve_work_experience(WORK_EXPERIENCE: list, llm):
 
             try:
                 list_fields = [
-                    "Score__WorkExperience",
-                    "Comments__WorkExperience",
-                    "Improvement__WorkExperience",
+                    "Score_WorkExperience",
+                    "Comments_WorkExperience",
+                    "Improvement_WorkExperience",
                 ]
                 list_rfind = [",\n", ",\n", "\n"]
                 list_exclude_first_car = [False, True, True]
@@ -863,39 +865,39 @@ def improve_work_experience(WORK_EXPERIENCE: list, llm):
                     response_content, list_fields, list_rfind, list_exclude_first_car
                 )
                 try:
-                    response_content_dict["Score__WorkExperience"] = int(
-                        response_content_dict["Score__WorkExperience"]
+                    response_content_dict["Score_WorkExperience"] = int(
+                        response_content_dict["Score_WorkExperience"]
                     )
                 except:
-                    response_content_dict["Score__WorkExperience"] = -1
+                    response_content_dict["Score_WorkExperience"] = -1
 
             except Exception as e:
                 response_content_dict = {
-                    "Score__WorkExperience": -1,
-                    "Comments__WorkExperience": "",
-                    "Improvement__WorkExperience": "",
+                    "Score_WorkExperience": -1,
+                    "Comments_WorkExperience": "",
+                    "Improvement_WorkExperience": "",
                 }
                 print(e)
                 st.error(e)
 
             # 4. update PROFESSIONAL_EXPERIENCE: Add the new keys (overall_quality, comments, Improvement.)
 
-            WORK_EXPERIENCE_i["Score__WorkExperience"] = response_content_dict[
-                "Score__WorkExperience"
+            WORK_EXPERIENCE_i["Score_WorkExperience"] = response_content_dict[
+                "Score_WorkExperience"
             ]
-            WORK_EXPERIENCE_i["Comments__WorkExperience"] = response_content_dict[
-                "Comments__WorkExperience"
+            WORK_EXPERIENCE_i["Comments_WorkExperience"] = response_content_dict[
+                "Comments_WorkExperience"
             ]
-            WORK_EXPERIENCE_i["Improvement__WorkExperience"] = response_content_dict[
-                "Improvement__WorkExperience"
+            WORK_EXPERIENCE_i["Improvement_WorkExperience"] = response_content_dict[
+                "Improvement_WorkExperience"
             ]
 
         except Exception as exception:
             st.error(exception)
             print(exception)
-            WORK_EXPERIENCE_i["Score__WorkExperience"] = -1
-            WORK_EXPERIENCE_i["Comments__WorkExperience"] = ""
-            WORK_EXPERIENCE_i["Improvement__WorkExperience"] = ""
+            WORK_EXPERIENCE_i["Score_WorkExperience"] = -1
+            WORK_EXPERIENCE_i["Comments_WorkExperience"] = ""
+            WORK_EXPERIENCE_i["Improvement_WorkExperience"] = ""
 
     return WORK_EXPERIENCE
 
@@ -913,14 +915,14 @@ def improve_projects(PROJECTS: list, llm):
             # 1. LLM call to improve the text quality of each duty
             response = improve_text_quality(
                 PROMPT_IMPROVE_PROJECT,
-                PROJECT_i["project__title"] + "\n" + PROJECT_i["project__description"],
+                PROJECT_i["project_title"] + "\n" + PROJECT_i["project_description"],
                 llm,
                 st.session_state.assistant_language,
             )
             response_content = response.content
 
             # 2. Convert response content to json dict with keys:
-            # ('Score__project','Comments__project','Improvement__project')
+            # ('Score_project','Comments_project','Improvement_project')
 
             response_content = response_content[
                 response_content.find("{") : response_content.rfind("}") + 1
@@ -928,9 +930,9 @@ def improve_projects(PROJECTS: list, llm):
 
             try:
                 list_fields = [
-                    "Score__project",
-                    "Comments__project",
-                    "Improvement__project",
+                    "Score_project",
+                    "Comments_project",
+                    "Improvement_project",
                 ]
                 list_rfind = [",\n", ",\n", "\n"]
                 list_exclude_first_car = [False, True, True]
@@ -939,33 +941,33 @@ def improve_projects(PROJECTS: list, llm):
                     response_content, list_fields, list_rfind, list_exclude_first_car
                 )
                 try:
-                    response_content_dict["Score__project"] = int(
-                        response_content_dict["Score__project"]
+                    response_content_dict["Score_project"] = int(
+                        response_content_dict["Score_project"]
                     )
                 except:
-                    response_content_dict["Score__project"] = -1
+                    response_content_dict["Score_project"] = -1
 
             except Exception as e:
                 response_content_dict = {
-                    "Score__project": -1,
-                    "Comments__project": "",
-                    "Improvement__project": "",
+                    "Score_project": -1,
+                    "Comments_project": "",
+                    "Improvement_project": "",
                 }
                 print(e)
 
             # 3. Update PROJECTS
-            PROJECT_i["Score__project"] = response_content_dict["Score__project"]
-            PROJECT_i["Comments__project"] = response_content_dict["Comments__project"]
-            PROJECT_i["Improvement__project"] = response_content_dict[
-                "Improvement__project"
+            PROJECT_i["Score_project"] = response_content_dict["Score_project"]
+            PROJECT_i["Comments_project"] = response_content_dict["Comments_project"]
+            PROJECT_i["Improvement_project"] = response_content_dict[
+                "Improvement_project"
             ]
 
         except Exception as exception:
             print(exception)
 
-            PROJECT_i["Score__project"] = -1
-            PROJECT_i["Comments__project"] = ""
-            PROJECT_i["Improvement__project"] = ""
+            PROJECT_i["Score_project"] = -1
+            PROJECT_i["Comments_project"] = ""
+            PROJECT_i["Improvement_project"] = ""
 
     return PROJECTS
 
@@ -992,6 +994,7 @@ the resume's top 3 strengths and top 3 weaknesses..."
         ).text
 
         # Invoke LLM
+        delayed()
         response = llm.invoke(prompt)
         response_content = response.content[
             response.content.find("{") : response.content.rfind("}") + 1
@@ -1023,32 +1026,29 @@ the resume's top 3 strengths and top 3 weaknesses..."
 def get_section_scores(SCANNED_RESUME):
     """Output in a dictionary the scores of all the sections of the resume (summary, skills...)"""
     dict_scores = {}
-
     # Summary, Skills, EDUCATION
     dict_scores["ContactInfo"] = max(
-        -1, SCANNED_RESUME["Contact__information"]["score__ContactInfo"]
+        -1, SCANNED_RESUME["Contact_information"]["score_ContactInfo"]
     )
     dict_scores["summary"] = max(
-        -1, SCANNED_RESUME["Summary__evaluation"]["score__summary"]
+        -1, SCANNED_RESUME["Summary_evaluation"]["score_summary"]
     )
     dict_scores["skills"] = max(
-        -1, SCANNED_RESUME["Skills__evaluation"]["score__skills"]
+        -1, SCANNED_RESUME["Skills_evaluation"]["score_skills"]
     )
     dict_scores["education"] = max(
-        -1, SCANNED_RESUME["Education__evaluation"]["score__edu"]
+        -1, SCANNED_RESUME["Education_evaluation"]["score_edu"]
     )
     dict_scores["language"] = max(
-        -1, SCANNED_RESUME["Languages__evaluation"]["score__language"]
+        -1, SCANNED_RESUME["Languages_evaluation"]["score_language"]
     )
-
     dict_scores["certfication"] = max(
-        -1, SCANNED_RESUME["Certif__evaluation"]["score__certif"]
+        -1, SCANNED_RESUME["Certif_evaluation"]["score_certif"]
     )
-
-    # Work__experience: The score is the average of the scores of all the work experiences.
+    # Work_experience: The score is the average of the scores of all the work experiences.
     scores = []
-    for work_experience in SCANNED_RESUME["Work__experience"]:
-        score = work_experience["Score__WorkExperience"]
+    for work_experience in SCANNED_RESUME["Work_experience"]:
+        score = work_experience["Score_WorkExperience"]
         if score > -1:
             scores.append(score)
     try:
@@ -1058,8 +1058,8 @@ def get_section_scores(SCANNED_RESUME):
 
     # Projects: The score is the average of the scores of all projects.
     scores = []
-    for project in SCANNED_RESUME["CV__Projects"]:
-        score = project["Score__project"]
+    for project in SCANNED_RESUME["CV_Projects"]:
+        score = project["Score_project"]
         if score > -1:
             scores.append(score)
     try:
@@ -1105,13 +1105,13 @@ def resume_analyzer_main(llm, llm_creative, documents):
     )
 
     # 8. Improve the quality of the work experience section.
-    PROFESSIONAL_EXPERIENCE["Work__experience"] = improve_work_experience(
-        WORK_EXPERIENCE=PROFESSIONAL_EXPERIENCE["Work__experience"], llm=llm_creative
+    PROFESSIONAL_EXPERIENCE["Work_experience"] = improve_work_experience(
+        WORK_EXPERIENCE=PROFESSIONAL_EXPERIENCE["Work_experience"], llm=llm_creative
     )
 
     # 9. Improve the quality of the project section.
-    PROFESSIONAL_EXPERIENCE["CV__Projects"] = improve_projects(
-        PROJECTS=PROFESSIONAL_EXPERIENCE["CV__Projects"], llm=llm_creative
+    PROFESSIONAL_EXPERIENCE["CV_Projects"] = improve_projects(
+        PROJECTS=PROFESSIONAL_EXPERIENCE["CV_Projects"], llm=llm_creative
     )
 
     # 10. Evaluate the Resume
@@ -1128,7 +1128,10 @@ def resume_analyzer_main(llm, llm_creative, documents):
         RESUME_EVALUATION,
     ]:
         SCANNED_RESUME.update(dictionary)
-
+    
+    st.info(f"**{get_current_time()}** \tcreate the SCANNED_RESUME dictionary")
+    print(f"**{get_current_time()}** \tcreate the SCANNED_RESUME dictionary")
+    
     # 12. Save the Scanned resume
     try:
         now = (datetime.datetime.now()).strftime("%Y%m%d_%H%M%S")
@@ -1137,5 +1140,7 @@ def resume_analyzer_main(llm, llm_creative, documents):
             json.dump(SCANNED_RESUME, fp)
     except:
         pass
-
+    st.info(f"**{get_current_time()}** \tSave the Scanned resume")
+    print(f"**{get_current_time()}** \tSave the Scanned resume")
+    
     return SCANNED_RESUME

@@ -1,7 +1,9 @@
 import streamlit as st
 import markdown
 from resume_analyzer import get_section_scores
-
+import time
+def delayed():
+    time.sleep(1) 
 
 def custom_markdown(
     text,
@@ -188,6 +190,7 @@ def display_resume_analysis(SCANNED_RESUME):
 
         for i in range(3):
             st.write("")
+            delayed()
             st.subheader(list_task[i])
             custom_markdown(
                 html_tag="div",
@@ -199,11 +202,12 @@ def display_resume_analysis(SCANNED_RESUME):
         #                      Display scores
         ###############################################################
         st.write("")
+        delayed()
         st.subheader("Scores over 100")
         st.write("")
 
         dict_scores = get_section_scores(SCANNED_RESUME)
-
+        
         display_scores_in_columns(
             section_names=[
                 "👤 Contact",
@@ -241,30 +245,31 @@ def display_resume_analysis(SCANNED_RESUME):
         # 1. Contact Information
 
         st.write("")
+        delayed()
         st.subheader(f"Contact Information - 🎯 **{dict_scores['ContactInfo']}**/100")
         display_section_results(
             expander_label="🛈 Contact Information",
             expander_header_fields=[
-                f"**👤 {SCANNED_RESUME['Contact__information']['candidate__name']}**",
-                f"{SCANNED_RESUME['Contact__information']['candidate__title']}",
+                f"**👤 {SCANNED_RESUME['Contact_information']['candidate_name']}**",
+                f"{SCANNED_RESUME['Contact_information']['candidate_title']}",
                 "",
                 [
-                    f"**📌 Location:** {SCANNED_RESUME['Contact__information']['candidate__location']}",
-                    f"**:telephone_receiver::** {SCANNED_RESUME['Contact__information']['candidate__phone']}",
+                    f"**📌 Location:** {SCANNED_RESUME['Contact_information']['candidate_location']}",
+                    f"**:telephone_receiver::** {SCANNED_RESUME['Contact_information']['candidate_phone']}",
                 ],
                 "",
                 "**Email and Social media:**",
-                f"**:e-mail:** {SCANNED_RESUME['Contact__information']['candidate__email']}",
+                f"**:e-mail:** {SCANNED_RESUME['Contact_information']['candidate_email']}",
             ],
-            expander_header_links=SCANNED_RESUME["Contact__information"][
-                "candidate__social_media"
+            expander_header_links=SCANNED_RESUME["Contact_information"][
+                "candidate_social_media"
             ],
             score=dict_scores["ContactInfo"],
             section_original_text_header=None,
             section_original_text=None,
             original_text_bullet_points=False,
-            section_assessment=SCANNED_RESUME["Contact__information"][
-                "evaluation__ContactInfo"
+            section_assessment=SCANNED_RESUME["Contact_information"][
+                "evaluation_ContactInfo"
             ],
             section_improved_text=None,
         )
@@ -273,6 +278,7 @@ def display_resume_analysis(SCANNED_RESUME):
 
         st.write("")
         st.write("")
+        delayed()
         st.subheader(f"Summary - 🎯 **{dict_scores['summary']}**/100")
         display_section_results(
             expander_label="Summary",
@@ -280,13 +286,13 @@ def display_resume_analysis(SCANNED_RESUME):
             expander_header_links=None,
             score=dict_scores["summary"],
             section_original_text_header="**📋 Summary:**",
-            section_original_text=[SCANNED_RESUME["CV__summary"]],
+            section_original_text=[SCANNED_RESUME["CV_summary"]],
             original_text_bullet_points=False,
-            section_assessment=SCANNED_RESUME["Summary__evaluation"][
-                "evaluation__summary"
+            section_assessment=SCANNED_RESUME["Summary_evaluation"][
+                "evaluation_summary"
             ],
-            section_improved_text=SCANNED_RESUME["Summary__evaluation"][
-                "CV__summary_enhanced"
+            section_improved_text=SCANNED_RESUME["Summary_evaluation"][
+                "CV_summary_enhanced"
             ],
         )
 
@@ -294,30 +300,31 @@ def display_resume_analysis(SCANNED_RESUME):
 
         st.write("")
         st.write("")
+        delayed()
         st.subheader(f"work experience - 🎯 **{dict_scores['work_experience']}**/100")
 
-        if len(SCANNED_RESUME["Work__experience"]) == 0:
+        if len(SCANNED_RESUME["Work_experience"]) == 0:
             st.info("No work experience results.")
         else:
-            for work_experience in SCANNED_RESUME["Work__experience"]:
+            for work_experience in SCANNED_RESUME["Work_experience"]:
                 display_section_results(
-                    expander_label=f"{work_experience['job__title']}",
+                    expander_label=f"{work_experience['job_title']}",
                     expander_header_fields=[
                         [
-                            f"**Company:**\n {work_experience['job__company']}",
-                            f"**📅**\n {work_experience['job__start_date']} - {work_experience['job__end_date']}",
+                            f"**Company:**\n {work_experience['job_company']}",
+                            f"**📅**\n {work_experience['job_start_date']} - {work_experience['job_end_date']}",
                         ]
                     ],
                     expander_header_links=None,
-                    score=work_experience["Score__WorkExperience"],
+                    score=work_experience["Score_WorkExperience"],
                     section_original_text_header="**📋 Responsibilities:**",
                     section_original_text=list(
-                        work_experience["work__duties"].values()
+                        work_experience["work_duties"].values()
                     ),
                     original_text_bullet_points=True,
-                    section_assessment=work_experience["Comments__WorkExperience"],
+                    section_assessment=work_experience["Comments_WorkExperience"],
                     section_improved_text=work_experience[
-                        "Improvement__WorkExperience"
+                        "Improvement_WorkExperience"
                     ],
                 )
 
@@ -332,10 +339,10 @@ def display_resume_analysis(SCANNED_RESUME):
             expander_header_links=None,
             score=dict_scores["skills"],
             section_original_text_header=None,
-            section_original_text=[SCANNED_RESUME["candidate__skills"]],
+            section_original_text=[SCANNED_RESUME["candidate_skills"]],
             original_text_bullet_points=True,
-            section_assessment=SCANNED_RESUME["Skills__evaluation"][
-                "evaluation__skills"
+            section_assessment=SCANNED_RESUME["Skills_evaluation"][
+                "evaluation_skills"
             ],
             section_improved_text=None,
         )
@@ -344,39 +351,41 @@ def display_resume_analysis(SCANNED_RESUME):
 
         st.write("")
         st.write("")
+        delayed()
         st.subheader(f"Education - 🎯 **{dict_scores['education']}**/100")
         with st.expander(f"🎓 Educational background and academic achievements."):
             st.write("")
-            list_education = SCANNED_RESUME["CV__Education"]
+            list_education = SCANNED_RESUME["CV_Education"]
             if not isinstance(list_education, list):
                 st.markdown(f"- {list_education}")
             else:
                 for edu in list_education:
                     col1, col2 = st.columns([6, 4])
                     with col1:
-                        st.markdown(f"**🎓 Degree:** {edu['edu__degree']}")
+                        st.markdown(f"**🎓 Degree:** {edu['edu_degree']}")
                     with col2:
                         st.markdown(
-                            f"**📅** {edu['edu__start_date']} - {edu['edu__end_date']}"
+                            f"**📅** {edu['edu_start_date']} - {edu['edu_end_date']}"
                         )
-                    st.markdown(f"**🏛️** {edu['edu__college']}")
+                    st.markdown(f"**🏛️** {edu['edu_college']}")
                     st.divider()
 
             display_assessment(
                 score=dict_scores["education"],
-                section_assessment=SCANNED_RESUME["Education__evaluation"][
-                    "evaluation__edu"
+                section_assessment=SCANNED_RESUME["Education_evaluation"][
+                    "evaluation_edu"
                 ],
             )
 
         # 6. Language (Optional section)
 
         st.divider()
+        delayed()
         st.subheader(f"Language - 🎯 **{dict_scores['language']}**/100")
         languages = []
-        for language in SCANNED_RESUME["CV__Languages"]:
+        for language in SCANNED_RESUME["CV_Languages"]:
             languages.append(
-                f"**🗣 {language['spoken__language']}** : {language['language__fluency']}"
+                f"**🗣 {language['spoken_language']}** : {language['language_fluency']}"
             )
         display_section_results(
             expander_label="🗣 Language",
@@ -386,8 +395,8 @@ def display_resume_analysis(SCANNED_RESUME):
             section_original_text_header=None,
             section_original_text=languages,
             original_text_bullet_points=False,
-            section_assessment=SCANNED_RESUME["Languages__evaluation"][
-                "evaluation__language"
+            section_assessment=SCANNED_RESUME["Languages_evaluation"][
+                "evaluation_language"
             ],
             section_improved_text=None,
         )
@@ -396,34 +405,35 @@ def display_resume_analysis(SCANNED_RESUME):
 
         st.write("")
         st.write("")
+        delayed()
         st.subheader(f"Certifications - 🎯 **{dict_scores['certfication']}**/100")
         with st.expander("🏅 Certifications"):
             st.write("")
-            list_certifs = SCANNED_RESUME["CV__Certifications"]
+            list_certifs = SCANNED_RESUME["CV_Certifications"]
             if not isinstance(list_certifs, list):
                 st.markdown(f"- {list_certifs}")
             else:
                 for certif in list_certifs:
                     col1, col2 = st.columns([6, 4])
                     with col1:
-                        st.markdown(f"**🏅 Title:** {certif['certif__title']}")
+                        st.markdown(f"**🏅 Title:** {certif['certif_title']}")
                     with col2:
-                        st.markdown(f"**📅** {certif['certif__date']} ")
-                    st.markdown(f"**🏛️** {certif['certif__organization']}")
+                        st.markdown(f"**📅** {certif['certif_date']} ")
+                    st.markdown(f"**🏛️** {certif['certif_organization']}")
 
-                    if certif["certif__expiry_date"].lower() != "unknown":
+                    if certif["certif_expiry_date"].lower() != "unknown":
                         st.markdown(
-                            f"**📅 Expiry date:** {certif['certif__expiry_date']}"
+                            f"**📅 Expiry date:** {certif['certif_expiry_date']}"
                         )
-                    if certif["certif__details"].lower() != "unknown":
+                    if certif["certif_details"].lower() != "unknown":
                         st.write("")
-                        st.markdown(f"{certif['certif__details']}")
+                        st.markdown(f"{certif['certif_details']}")
                     st.divider()
 
                 display_assessment(
                     score=dict_scores["certfication"],
-                    section_assessment=SCANNED_RESUME["Certif__evaluation"][
-                        "evaluation__certif"
+                    section_assessment=SCANNED_RESUME["Certif_evaluation"][
+                        "evaluation_certif"
                     ],
                 )
 
@@ -431,23 +441,24 @@ def display_resume_analysis(SCANNED_RESUME):
 
         st.write("")
         st.write("")
+        delayed()
         st.subheader(f"Projects - 🎯 **{dict_scores['projects']}**/100")
-        if len(SCANNED_RESUME["CV__Projects"]) == 0:
+        if len(SCANNED_RESUME["CV_Projects"]) == 0:
             st.info("No projects found.")
         else:
-            for project in SCANNED_RESUME["CV__Projects"]:
+            for project in SCANNED_RESUME["CV_Projects"]:
                 display_section_results(
-                    expander_label=f"{project['project__title']}",
+                    expander_label=f"{project['project_title']}",
                     expander_header_fields=[
-                        f"**📅**\n {project['project__start_date']} - {project['project__end_date']}"
+                        f"**📅**\n {project['project_start_date']} - {project['project_end_date']}"
                     ],
                     expander_header_links=None,
-                    score=project["Score__project"],
+                    score=project["Score_project"],
                     section_original_text_header="**📋 Project details:**",
-                    section_original_text=[project["project__description"]],
+                    section_original_text=[project["project_description"]],
                     original_text_bullet_points=True,
-                    section_assessment=project["Comments__project"],
-                    section_improved_text=project["Improvement__project"],
+                    section_assessment=project["Comments_project"],
+                    section_improved_text=project["Improvement_project"],
                 )
 
     except Exception as exception:

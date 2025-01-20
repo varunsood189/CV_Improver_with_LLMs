@@ -3,7 +3,7 @@ import os
 
 # 1. Constants
 
-list_LLM_providers = [":rainbow[**OpenAI**]", "**Google Generative AI**"]
+list_LLM_providers = [":rainbow[**OpenAI**]", "**Google Generative AI**","** cohere ***"]
 
 list_Assistant_Languages = [
     "english",
@@ -27,29 +27,29 @@ templates = {}
 
 # 2.1 Contact information Section
 templates[
-    "Contact__information"
+    "Contact_information"
 ] = """Extract and evaluate the contact information. \
 Output a dictionary with the following keys:
-- candidate__name 
-- candidate__title
-- candidate__location
-- candidate__email
-- candidate__phone
-- candidate__social_media: Extract a list of all social media profiles, blogs or websites.
-- evaluation__ContactInfo: Evaluate in {language} the contact information.
-- score__ContactInfo: Rate the contact information by giving a score (integer) from 0 to 100.
+- candidate_name 
+- candidate_title
+- candidate_location
+- candidate_email
+- candidate_phone
+- candidate_social_media: Extract a list of all social media profiles, blogs or websites.
+- evaluation_ContactInfo: Evaluate in {language} the contact information.
+- score_ContactInfo: Rate the contact information by giving a score (integer) from 0 to 100.
 """
 
 # 2.2. Summary Section
 templates[
-    "CV__summary"
+    "CV_summary"
 ] = """Extract the summary and/or objective section. This is a separate section of the resume. \
 If the resume doed not contain a summary and/or objective section, then simply write "unknown"."""
 
 # 2.3. WORK Experience Section
 
 templates[
-    "Work__experience"
+    "Work_experience"
 ] = """Extract all work experiences. For each work experience: 
 1. Extract the job title.
 2. Extract the company.  
@@ -57,14 +57,14 @@ templates[
 YYYY/MM/DD or YYYY/MM or YYYY (depending on the availability of the day and month).
 4. Extract the end date and output it in the following format: \
 YYYY/MM/DD or YYYY/MM or YYYY (depending on the availability of the day and month).
-5. Create a dictionary with the following keys: job__title, job__company, job__start_date, job__end_date.
+5. Create a dictionary with the following keys: job_title, job_company, job_start_date, job_end_date.
 
 Format your response as a list of dictionaries.
 """
 
 # 2.4. Projects Section
 templates[
-    "CV__Projects"
+    "CV_Projects"
 ] = """Include any side projects outside the work experience. 
 For each project:
 1. Extract the title of the project. 
@@ -72,14 +72,14 @@ For each project:
 YYYY/MM/DD or YYYY/MM or YYYY (depending on the availability of the day and month).
 3. Extract the end date and output it in the following format: \
 YYYY/MM/DD or YYYY/MM or YYYY (depending on the availability of the day and month).
-4. Create a dictionary with the following keys: project__title, project__start_date, project__end_date.
+4. Create a dictionary with the following keys: project_title, project_start_date, project_end_date.
 
 Format your response as a list of dictionaries.
 """
 
 # 2.5. Education Section
 templates[
-    "CV__Education"
+    "CV_Education"
 ] = """Extract all educational background and academic achievements.
 For each education achievement:
 1. Extract the name of the college or the high school. 
@@ -88,56 +88,56 @@ For each education achievement:
 YYYY/MM/DD or YYYY/MM or YYYY (depending on the availability of the day and month).
 4. Extract the end date and output it in the following format: \
 YYYY/MM/DD or YYYY/MM or YYYY (depending on the availability of the day and month).
-5. Create a dictionary with the following keys: edu__college, edu__degree, edu__start_date, edu__end_date.
+5. Create a dictionary with the following keys: edu_college, edu_degree, edu_start_date, edu_end_date.
 
 Format your response as a list of dictionaries.
 """
 
 templates[
-    "Education__evaluation"
+    "Education_evaluation"
 ] = """Your task is to perform the following actions:  
 1. Rate the quality of the Education section by giving an integer score from 0 to 100. 
 2. Evaluate (in three sentences and in {language}) the quality of the Education section.
-3. Format your response as a dictionary with the following keys: score__edu, evaluation__edu.
+3. Format your response as a dictionary with the following keys: score_edu, evaluation_edu.
 """
 
 # 2.6. Skills
 templates[
-    "candidate__skills"
+    "candidate_skills"
 ] = """Extract the list of soft and hard skills from the skill section. Output a list.
 The skill section is a separate section.
 """
 
 templates[
-    "Skills__evaluation"
+    "Skills_evaluation"
 ] = """Your task is to perform the following actions: 
 1. Rate the quality of the Skills section by giving an integer score from 0 to 100.
 2. Evaluate (in three sentences and in {language}) the quality of the Skills section.
-3. Format your response as a dictionary with the following keys: score__skills, evaluation__skills.
+3. Format your response as a dictionary with the following keys: score_skills, evaluation_skills.
 """
 
 # 2.7. Languages
 templates[
-    "CV__Languages"
+    "CV_Languages"
 ] = """Extract all the languages that the candidate can speak. For each language:
 1. Extract the language.
 2. Extract the fluency. If the fluency is not available, then simply write "unknown".
-3. Create a dictionary with the following keys: spoken__language, language__fluency.
+3. Create a dictionary with the following keys: spoken_language, language_fluency.
 
 Format your response as a list of dictionaries.
 """
 
 templates[
-    "Languages__evaluation"
+    "Languages_evaluation"
 ] = """ Your task is to perform the following actions: 
 1. Rate the quality of the language section by giving an integer score from 0 to 100.
 2. Evaluate (in three sentences and in {language}) the quality of the language section.
-3. Format your response as a dictionary with the following keys: score__language,evaluation__language.
+3. Format your response as a dictionary with the following keys: score_language,evaluation_language.
 """
 
 # 2.8. Certifications
 templates[
-    "CV__Certifications"
+    "CV_Certifications"
 ] = """Extraction of all certificates other than education background and academic achievements. \
 For each certificate: 
 1. Extract the title of the certification. 
@@ -147,17 +147,17 @@ YYYY/MM/DD or YYYY/MM or YYYY (depending on the availability of the day and mont
 4. Extract the certification expiry date and output it in the following format: \
 YYYY/MM/DD or YYYY/MM or YYYY (depending on the availability of the day and month).
 5. Extract any other information listed about the certification. if not found, then simply write "unknown".
-6. Create a dictionary with the following keys: certif__title, certif__organization, certif__date, certif__expiry_date, certif__details.
+6. Create a dictionary with the following keys: certif_title, certif_organization, certif_date, certif_expiry_date, certif_details.
 
 Format your response as a list of dictionaries.
 """
 
 templates[
-    "Certif__evaluation"
+    "Certif_evaluation"
 ] = """Your task is to perform the following actions: 
 1. Rate the certifications by giving an integer score from 0 to 100.
 2. Evaluate (in three sentences and in {language}) the certifications and the quality of the text.
-3. Format your response as a dictionary with the following keys: score__certif,evaluation__certif.
+3. Format your response as a dictionary with the following keys: score_certif,evaluation_certif.
 """
 
 
@@ -171,7 +171,7 @@ If the summary is "unknown", the score is 0.
 3. In {language}, strengthen the summary. The summary should not exceed 5 sentences. \
 If the summary is "unknown", generate a strong summary in {language} with no more than 5 sentences. \
 Please include: years of experience, top skills and experiences, some of the biggest achievements, and finally an attractive objective.
-4. Format your response as a dictionary with the following keys: evaluation__summary, score__summary, CV__summary_enhanced.
+4. Format your response as a dictionary with the following keys: evaluation_summary, score_summary, CV_summary_enhanced.
 
 <summary>
 {summary}
@@ -188,7 +188,7 @@ PROMPT_IMPROVE_WORK_EXPERIENCE = """you are given a work experience text delimit
 3. Strengthen the work experience text to make it more appealing to a recruiter in {language}. \
 Provide additional details on responsibilities and quantify results for each bullet point. \
 Format your text as a string in {language}.
-4. Format your response as a dictionary with the following keys: "Score__WorkExperience", "Comments__WorkExperience" and "Improvement__WorkExperience".
+4. Format your response as a dictionary with the following keys: "Score_WorkExperience", "Comments_WorkExperience" and "Improvement_WorkExperience".
 
 Work experience text: ```{text}```
 """
@@ -199,7 +199,7 @@ PROMPT_IMPROVE_PROJECT = """you are given a project text delimited by triple bac
 3. Strengthen the project text to make it more appealing to a recruiter in {language}, \
 including the problem, the approach taken, the tools used and quantifiable results. \
 Format your text as a string in {language}.
-4. Format your response as a dictionary with the following keys: Score__project, Comments__project, Improvement__project.
+4. Format your response as a dictionary with the following keys: Score_project, Comments_project, Improvement_project.
 
 project text: ```{text}```
 """

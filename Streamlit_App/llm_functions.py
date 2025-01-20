@@ -6,6 +6,10 @@ from langchain_openai import ChatOpenAI
 # LLM: google_genai
 from langchain_google_genai import ChatGoogleGenerativeAI
 
+
+# LLM: cohere
+from langchain_cohere import ChatCohere
+
 # dotenv and os
 from dotenv import load_dotenv, find_dotenv
 import os
@@ -61,14 +65,30 @@ def instantiate_LLM(
             top_p=top_p,
             convert_system_message_to_human=True,
         )
-
+    if LLM_provider == "Cohere":
+        llm = ChatCohere(
+            cohere_api_key=api_key,
+            # model="gemini-pro",
+            model="command-r-plus-08-2024",
+            temperature=temperature,
+            top_p=top_p,
+            convert_system_message_to_human=True
+        )
     return llm
 
 
 def instantiate_LLM_main(temperature, top_p):
     """Instantiate the selected LLM model."""
     try:
-        if st.session_state.LLM_provider == "OpenAI":
+        if st.session_state.LLM_provider=="Cohere":
+            llm = instantiate_LLM(
+                "Cohere",
+                api_key=st.session_state.cohere_api_key,
+                temperature=temperature,
+                top_p=top_p,
+                model_name=st.session_state.selected_model
+                )
+        elif st.session_state.LLM_provider == "OpenAI":
             llm = instantiate_LLM(
                 "OpenAI",
                 api_key=st.session_state.openai_api_key,
@@ -84,6 +104,8 @@ def instantiate_LLM_main(temperature, top_p):
                 top_p=top_p,
                 model_name=st.session_state.selected_model,
             )
+
+            
     except Exception as e:
         st.error(f"An error occured: {e}")
         llm = None

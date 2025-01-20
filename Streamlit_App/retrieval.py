@@ -15,6 +15,7 @@ from langchain_community.llms import Cohere
 # Embeddings
 from langchain_openai import OpenAIEmbeddings
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain.embeddings import CohereEmbeddings
 
 # FAISS vector database
 from langchain_community.vectorstores import FAISS
@@ -94,7 +95,7 @@ def tiktoken_tokens(documents, model="gpt-3.5-turbo-0125"):
     return tokens_length
 
 
-def select_embeddings_model(LLM_service="OpenAI"):
+def select_embeddings_model(LLM_service="Cohere"):
     """Select the Embeddings model: OpenAIEmbeddings or GoogleGenerativeAIEmbeddings."""
 
     if LLM_service == "OpenAI":
@@ -104,7 +105,11 @@ def select_embeddings_model(LLM_service="OpenAI"):
         embeddings = GoogleGenerativeAIEmbeddings(
             model="models/embedding-001", google_api_key=st.session_state.google_api_key
         )
-
+    if LLM_service == "Cohere":
+        embeddings = CohereEmbeddings(model="embed-english-light-v3.0",
+            cohere_api_key=st.session_state.cohere_api_key,
+            user_agent="my-app/1.0"  # Replace with your app's name/version
+                                      )
     return embeddings
 
 
@@ -174,7 +179,6 @@ def retrieval_main():
         # 3. Load documents with Langchain loaders
         documents = langchain_document_loader(saved_file_path)
         st.session_state.documents = documents
-
         # 4. Embeddings
         embeddings = select_embeddings_model(st.session_state.LLM_provider)
 

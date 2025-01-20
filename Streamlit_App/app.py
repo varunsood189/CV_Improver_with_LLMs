@@ -22,7 +22,7 @@ def main():
                 st.session_state.llm_creative = instantiate_LLM_main(
                     temperature=st.session_state.temperature,
                     top_p=st.session_state.top_p,
-                )
+                )  
 
                 # 4. Analyze the resume
                 st.session_state.SCANNED_RESUME = resume_analyzer_main(

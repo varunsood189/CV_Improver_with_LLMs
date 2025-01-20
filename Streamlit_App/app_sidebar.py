@@ -9,6 +9,7 @@ def expander_model_parameters(
     list_models=["gpt-3.5-turbo-0125", "gpt-3.5-turbo", "gpt-4-turbo-preview"],
     openai_api_key="",
     google_api_key="",
+    cohere_api_key="",
 ):
     """Add a text_input (for the API key) and a streamlit expander with models and parameters."""
 
@@ -29,7 +30,13 @@ def expander_model_parameters(
             value=google_api_key,
             placeholder="insert your API key",
         )
-
+    if LLM_provider == "Cohere":
+        st.session_state.cohere_api_key = st.text_input(
+            text_input_API_key,
+            type="password",
+            value=cohere_api_key,
+            placeholder="insert your API key",
+        )
     with st.expander("**Models and parameters**"):
         st.session_state.selected_model = st.selectbox(
             f"Choose {LLM_provider} model", list_models
@@ -81,6 +88,7 @@ def sidebar(openai_api_key, google_api_key, cohere_api_key):
                 ],
                 openai_api_key=openai_api_key,
                 google_api_key=google_api_key,
+                cohere_api_key=cohere_api_key,                
             )
 
         if llm_chooser == list_LLM_providers[1]:
@@ -90,8 +98,17 @@ def sidebar(openai_api_key, google_api_key, cohere_api_key):
                 list_models=["gemini-pro"],
                 openai_api_key=openai_api_key,
                 google_api_key=google_api_key,
+                cohere_api_key=cohere_api_key,
             )
-
+        if llm_chooser == list_LLM_providers[2]:
+            expander_model_parameters(
+                LLM_provider="Cohere",
+                text_input_API_key="Cohere API Key - [Get an API key]",
+                list_models=["command-r-plus-08-2024"],
+                openai_api_key=openai_api_key,
+                google_api_key=google_api_key,
+                cohere_api_key=cohere_api_key
+            )
         # Cohere API Key
         st.write("")
         st.session_state.cohere_api_key = st.text_input(
